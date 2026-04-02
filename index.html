@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Search Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-12">
+
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-6">
+            <h1 class="text-2xl font-bold text-slate-800 mb-6">Search Portal</h1>
+            
+            <form id="searchForm" class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="queryInput" 
+                    placeholder="Search covid-19..." 
+                    class="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                    required
+                >
+                <button 
+                    type="submit" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-md shadow-blue-100"
+                >
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+            <iframe id="contentFrame" src="iframe.html" class="w-full h-[450px]"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('searchForm');
+        const iframe = document.getElementById('contentFrame');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const q = document.getElementById('queryInput').value;
+            
+            // 1. Construct new URL for the parent address bar
+            const newUrl = `${window.location.pathname}?q=${encodeURIComponent(q)}&page=1`;
+            
+            // 2. Update the address bar without a full page refresh
+            window.history.pushState({ path: newUrl }, '', newUrl);
+
+            // 3. Force the iframe to reload to pick up the new parent URL params
+            iframe.contentWindow.location.reload();
+        });
+    </script>
+</body>
+</html>

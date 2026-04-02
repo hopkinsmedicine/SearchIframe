@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white p-6 font-sans text-slate-800">
+
+    <div id="emptyState" class="flex flex-col items-center justify-center h-64 text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <p class="text-sm">Enter a query above to see results.</p>
+    </div>
+
+    <div id="resultsUI" class="hidden">
+        <div id="loader" class="text-blue-600 text-sm font-medium animate-pulse mb-4">Fetching results...</div>
+        
+        <div id="mainContent" class="hidden">
+            <div class="mb-6">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Search Results for:
+                <span id="keywordDisplay" class="inline-block text-black italic"></span>
+				</h2>
+            </div>
+
+            <div id="itemsContainer" class="space-y-3 mb-8">
+                </div>
+
+            <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+                <span id="rangeLabel" class="text-sm font-medium text-slate-500 italic">Showing 0 to 0</span>
+                
+                <div class="flex gap-2">
+                    <button id="prevBtn" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition">
+                        Previous
+                    </button>
+                    <button id="nextBtn" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use URLSearchParams to read the PARENT window's URL
+        const parentParams = new URLSearchParams(window.parent.location.search);
+        const q = parentParams.get('q');
+        const page = parseInt(parentParams.get('page')) || 1;
+        const limit = 10;
+        const total = 100;
+
+        async function init() {
+            // Exit if no search has been made yet
+            if (!q) return;
+
+            // Show Results UI, Hide Empty State
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('resultsUI').classList.remove('hidden');
+            document.getElementById('keywordDisplay').innerText = `"${q}"`;
+
+            try {
+                // Perform the POST request
+                await fetch('https://jsonplaceholder.typicode.com/posts', {
+                    method: 'POST',
+                    body: JSON.stringify({ q, page, items: limit }),
+                    headers: { 'Content-type': 'application/json' }
+                });
+
+                // Calculate pagination math
+                const start = (page - 1) * limit + 1;
+                const end = Math.min(page * limit, total);
+
+                renderUI(start, end);
+            } catch (error) {
+                console.error("API Error:", error);
+            }
+        }
+
+        function renderUI(start, end) {
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            
+            document.getElementById('rangeLabel').innerText = `Showing ${start} to ${end} of ${total}`;
+
+            // Mock visual results
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = Array(2).fill(0).map((_, i) => `
+                <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div class="h-2 w-16 bg-blue-200 rounded mb-2"></div>
+                    <div class="h-3 w-3/4 bg-slate-200 rounded"></div>
+                </div>
+            `).join('');
+
+            // Button Logic
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.disabled = (page <= 1);
+            nextBtn.disabled = (end >= total);
+
+            prevBtn.onclick = () => handlePageChange(page - 1);
+            nextBtn.onclick = () => handlePageChange(page + 1);
+        }
+
+        function handlePageChange(newPage) {
+            const newUrl = `${window.parent.location.pathname}?q=${encodeURIComponent(q)}&page=${newPage}`;
+            window.parent.history.pushState({}, '', newUrl);
+            window.location.reload(); 
+        }
+
+        init();
+    </script>
+</body>
+</html>
