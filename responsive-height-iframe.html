@@ -37,7 +37,7 @@
 			function sendHeight(){
 				if (parent.postMessage) {
 					var height = document.querySelector('.siteSearchResults').offsetHeight;
-					parent.postMessage(height, '/');
+					parent.postMessage("resize:" + height, '/');
 				}
 			}
 			window.addEventListener("load", sendHeight);

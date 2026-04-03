@@ -48,9 +48,9 @@
             });
 
             window.addEventListener("message", function(event) {
-                if (isNaN(event.data)) return;
-
-                document.getElementById('resultsFrame').style.height = event.data + "px";
+                if (typeof event.data != "string" || event.data.indexOf("resize:") == -1) return;
+                
+                document.getElementById('resultsFrame').style.height = event.data.replace("resize:", "") + "px";
             }, false);
         })();
     </script>
