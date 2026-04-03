@@ -32,16 +32,37 @@
     </div>
 
     <script>
-        // We need this tiny bit of logic to "hand off" the parent's URL params to the iframe
-        const params = window.location.search;
-        const iframe = document.getElementById('resultsFrame');
-        
-        // If the parent has ?q=covid, we load iframe.html?q=covid
-        if (params) {
-            iframe.src = "no-js-iframe.html" + params;
-        } else {
-            iframe.src = "no-js-iframe.html";
-        }
+        (function(){
+            window.addEventListener("load", function(){
+                // We need this tiny bit of logic to "hand off" the parent's URL params to the iframe
+                var params = window.location.search,
+                    iframe = document.getElementById('resultsFrame'),
+                    iframeUrl = "responsive-height-iframe.html";
+                
+                // If the parent has ?q=covid, we load iframe.html?q=covid
+                if (params) {
+                    iframe.src = iframeUrl + params;
+                } else {
+                    iframe.src = iframeUrl;
+                }
+            });
+
+            window.addEventListener("message", function(event) {
+                if (isNaN(event.data)) return;
+
+                document.getElementById('resultsFrame').style.height = event.data + "px";
+            }, false);
+        })();
     </script>
+    <style>
+        #resultsFrame {
+            width: 100%;
+        }
+        .results-frame-container {
+            margin-top: 2.5rem;
+            max-width: 47rem;
+        }
+    </style>
+    
 </body>
 </html>

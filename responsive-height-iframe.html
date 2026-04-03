@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white p-6 font-sans siteSearchResults">
+
+    <div id="emptyState" class="flex flex-col items-center justify-center h-64 text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <p class="text-sm">Enter a query above to see results.</p>
+    </div>
+
+    <div id="resultsUI" class="hidden">
+        <div class="mb-6">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 text-black">Search Results for:
+                <span id="keywordDisplay" class="inline-block italic"></span>
+            </h2>
+        </div>
+
+        <div id="itemsContainer" class="space-y-3 mb-8"></div>
+
+        <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+            <span id="paginationLabel" class="text-sm font-medium text-slate-500"></span>
+            
+            <div class="flex gap-2">
+                <a id="prevBtn" target="_top" class="hidden px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition">Previous</a>
+                <a id="nextBtn" target="_top" class="hidden px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition">Next</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+			function sendHeight(){
+				if (parent.postMessage) {
+					var height = document.querySelector('.siteSearchResults').offsetHeight;
+					parent.postMessage(height, '/');
+				}
+			}
+			window.addEventListener("load", sendHeight);
+			window.addEventListener("resize", sendHeight);
+
+		})();
+    </script>
+</body>
+</html>
